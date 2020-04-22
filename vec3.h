@@ -44,12 +44,28 @@ public:
         return sqrt(length_squared());
     }
 
+    inline static vec3 random() {
+        return vec3(random_double(), random_double(), random_double());
+    }
+    inline static vec3 random(double min, double max) {
+        return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+    }
+
+    static vec3 random_in_unit_sphere() {
+        while(true) {
+            auto p = vec3::random(-1, 1);
+            if(p.length_squared() >= 1) continue;
+            return p;
+        }
+    }
+
     void write_color(std::ostream &out, int samples_per_pixel) {
         //Divide the color total by the number of samples
+        // gamma 2.0 correction
         auto scale = 1.0 / samples_per_pixel;
-        auto r = scale * e[0];
-        auto g = scale * e[1];
-        auto b = scale * e[2];
+        auto r = sqrt(scale * e[0]);
+        auto g = sqrt(scale * e[1]);
+        auto b = sqrt(scale * e[2]);
         // Write the translated [0,255] value of each color component.
         out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
             << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
